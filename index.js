@@ -1,36 +1,27 @@
-export default {
-  async fetch(request, env, ctx) {
-    const apiToken = "F9NUByTFx4UDYT1GCZhoIJyfF0GKNRvuctW74Ynl6tgHSdOW";
+import express from 'express';
+import fetch from 'node-fetch';
 
-    try {
-      const response = await fetch("https://sdk.vikey.it/api/reservations", {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${apiToken}`
-        }
-      });
+const app = express();
+const port = process.env.PORT || 3000;
 
-      const text = await response.text();
+app.get('/', async (req, res) => {
+  const apiToken = 'F9NUBJYfX4UDY1t6CZhoIJyfF0GKNRvuctW74Yn16tghSD0W';
 
-      return new Response(text, {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
-        }
-      });
+  try {
+    const response = await fetch('https://sdk.vikey.it/api/reservations', {
+      headers: {
+        'Authorization': `Bearer ${apiToken}`
+      }
+    });
 
-    } catch (err) {
-      return new Response(JSON.stringify({
-        status: "error",
-        message: err.message
-      }), {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
-        }
-      });
-    }
+    const data = await response.json();
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'No se pudo conectar a la API de Vikey', detalle: error.message });
   }
-};
+});
+
+app.listen(port, () => {
+  console.log(`Servidor escuchando en puerto ${port}`);
+});
